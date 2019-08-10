@@ -184,6 +184,16 @@ ajusteConsultora(Pcia,Partido,VotosAjustados):-
 
 %%PUNTO 6
 
+promesas(inflacion).
+promesas(nuevosPuestosDeTrabajo).
+promesas(hospitales).
+promesas(jardines).
+promesas(escuelas).
+promesas(universidad).
+promesas(comisarias).
+
+
+
 promesa(azul,edilicio(hospital, 1000)).
 promesa(azul,edilicio(jardines, 100)).
 promesa(azul,edilicio(escuelas,5)).
@@ -192,6 +202,7 @@ promesa(amarillo,edilicio(hospital,100)).
 promesa(amarillo,edilicio(universidad,1)).
 promesa(amarillo,edilicio(comisarias,200)).
 
+promesa(rojo,edilicio(bar,20)).
 
 promesa(azul,nuevosPuestosDeTrabajo(0)).
 promesa(amarillo,nuevosPuestosDeTrabajo(10000)).
@@ -206,60 +217,61 @@ promete(Partido,Promesa):-
 		promesa(Partido,Promesa).
 
 
+
+
 %%PUNTO 7
 
 
-%%Caso_A
-influenciaDePromesas(Partido,Pcia,VotosFinales):-
-		intencionDeVotoEn(Pcia,Partido,VotosIniciales),
-
+influenciaDePromesas(Promesa,Partido,IntencionVotos) :-
+		Promesa = inflacion,
 		promesa(Partido,inflacion(CotaInf,CotaSup)),
-		SumaInflacion is (CotaInf+CotaSup)/2,
+		IntencionVotos is ((CotaInf+CotaSup)/2).
 
+influenciaDePromesas(Promesa,Partido,IntencionVotos) :-
+		Promesa = nuevosPuestosDeTrabajo,
 		promesa(Partido,nuevosPuestosDeTrabajo(NumeroPuestos)),
 		(NumeroPuestos>50000 ->
-		SumaPuestosTrabajo is 3	; SumaPuestosTrabajo is 0),
-	
+		IntencionVotos is 3	; IntencionVotos is 0).
+
+
+influenciaDePromesas(Promesa,Partido,IntencionVotos) :-
+		Promesa = hospitales,
 		(promesa(Partido,edilicio(hospital,_)) ->
-		SumaConstruccionesHospitales is 2 ; SumaConstruccionesHospitales is 0),
+		IntencionVotos is 2 ; IntencionVotos is 0).
 
+
+influenciaDePromesas(Promesa,Partido,IntencionVotos) :-
+		Promesa = comisarias,
 		(promesa(Partido,edilicio(comisarias,200)) -> 
-		SumaConstruccionesComisarias is 2 ; SumaConstruccionesComisarias is 0),
+		IntencionVotos is 2 ; IntencionVotos is 0).
 
+
+influenciaDePromesas(Promesa,Partido,IntencionVotos) :-
+		Promesa = jardines,
+		(promesa(Partido,edilicio(jardines,NroJardines)) -> 
+		IntencionVotos is NroJardines * 0.1 ; IntencionVotos is 0).
+
+
+influenciaDePromesas(Promesa,Partido,IntencionVotos) :-
+		Promesa = escuelas,
 		(promesa(Partido,edilicio(escuelas,NroEscuelas)) -> 
-		SumaConstruccionesEscuelas is NroEscuelas*0.1 ; SumaConstruccionesEscuelas is 0),
-
-		(promesa(Partido,edilicio(jardines,NroJardines)) ->
-		SumaConstruccionesJardines is NroJardines*0.1 ; SumaConstruccionesJardines is 0),
-
-		promesa(Partido,edilicio(OtroEdificio,NroOtroEdificio)),%%Caso Edilicio distinto
-		OtroEdificio\=hospital,
-		OtroEdificio\=comisarias,
-		OtroEdificio\=escuelas,
-		OtroEdificio\=jardines,
-		OtroEdificio\=universidad ->
-
-		VotosFinales is VotosIniciales+
-						-SumaInflacion+
-						SumaPuestosTrabajo+
-						SumaConstruccionesHospitales+
-						SumaConstruccionesEscuelas+
-						SumaConstruccionesJardines+
-						SumaConstruccionesComisarias-
-						NroOtroEdificio ;
+		IntencionVotos is NroEscuelas * 0.1 ; IntencionVotos is 0).
 
 
-		VotosFinales is VotosIniciales+
-						-SumaInflacion+
-						SumaPuestosTrabajo+
-						SumaConstruccionesHospitales+
-						SumaConstruccionesEscuelas+
-						SumaConstruccionesJardines+
-						SumaConstruccionesComisarias.	
+influenciaDePromesas(Promesa,Partido,IntencionVotos) :-
+		Promesa = universidad,
+		(promesa(Partido,edilicio(universidad,_)) -> 
+		IntencionVotos is 0 ; IntencionVotos is 0).
 
 
-
-%%PUNTO 8
+influenciaDePromesas(Promesa,Partido,IntencionVotos) :-
+		 ((promesa(Partido,edilicio(OtroEdificio,NroOtroEdificio)),
+			OtroEdificio\=hospital,
+			OtroEdificio\=comisarias,
+			OtroEdificio\=escuelas,
+			OtroEdificio\=jardines,
+			OtroEdificio\=universidad) ->
+		IntencionVotos is -NroOtroEdificio ; IntencionVotos is 0). 
 
 %%CASO A
 promedioDeCrecimiento(Partido,PromedioFinal):-
@@ -283,12 +295,12 @@ promedioDeCrecimiento(Partido,PromedioFinal):-
 		(promesa(Partido,edilicio(jardines,NroJardines)) ->
 		PromedioConstruccionJardines is NroJardines*0.1 ; PromedioConstruccionJardines is 0),
 
-		 (promesa(Partido,edilicio(OtroEdificio,NroOtroEdificio)),
+		 ((promesa(Partido,edilicio(OtroEdificio,NroOtroEdificio)),
 			OtroEdificio\=hospital,
 			OtroEdificio\=comisarias,
 			OtroEdificio\=escuelas,
 			OtroEdificio\=jardines,
-			OtroEdificio\=universidad ->
+			OtroEdificio\=universidad) ->
 
 
 		PromedioFinal is 		-PromedioInflacion+
@@ -306,9 +318,6 @@ promedioDeCrecimiento(Partido,PromedioFinal):-
 								PromedioConstruccionesComisarias+
 								PromedioConstruccionesEscuelas+
 								PromedioConstruccionJardines).
-
-
-
 
 
 
