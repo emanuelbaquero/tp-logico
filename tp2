@@ -120,7 +120,7 @@ intencionDeVotoEn(misiones, amarillo, 0).
 
 
 %%Caso1 partidos distintos 
-leGana(Candidato1,Candidato2,Pcia):-
+leGanaA(Candidato1,Candidato2,Pcia):-
 		esCandidato(Candidato1,Partido1),
 		esCandidato(Candidato2,Partido2),
 		partidoDe(Pcia,Partido1),
@@ -132,20 +132,20 @@ leGana(Candidato1,Candidato2,Pcia):-
 
 
 %%Caso2 mismos partidos
-leGana(Candidato1,Candidato2,Pcia):-
+leGanaA(Candidato1,Candidato2,Pcia):-
 		esCandidato(Candidato1,Partido),
 		esCandidato(Candidato2,Partido),
 		partidoDe(Pcia,Partido),
 		Candidato1\=Candidato2.
 
 %%Caso3 Candidato de ningun partido  
-leGana(Candidato1,Candidato2,Pcia):-
+leGanaA(Candidato1,Candidato2,Pcia):-
 		not(candidato(Candidato2)),
 		esCandidato(Candidato1,Partido),
 		partidoDe(Pcia,Partido).
 
 %%Caso4 partido que n compite en pcia
-leGana(Candidato1,Candidato2,Pcia):-
+leGanaA(Candidato1,Candidato2,Pcia):-
 		esCandidato(Candidato1,Partido1),
 		esCandidato(Candidato2,Partido2),
 		partidoDe(Pcia,Partido1),
@@ -157,26 +157,32 @@ leGana(Candidato1,Candidato2,Pcia):-
 
 
 elGranCandidato(UnCandidato):-
+	
 		nacio(UnCandidato,Anio),
-		nacio(OtroCandidato,Anio2),
-		UnCandidato\=OtroCandidato,
-		Anio>Anio2,
 		esCandidato(UnCandidato,Partido),
-		esCandidato(OtroCandidato,Partido),
-		intencionDeVotoEn(Pcia, Partido, Votos1),
-		intencionDeVotoEn(Pcia, Partido2, Votos2),
-		Partido\=Partido2,
-		forall(partidoDe(Pcia,Partido),Votos1>Votos2).
+		forall(	(nacio(OtroCandidato,Anio2),	
+				esCandidato(UnCandidato,Partido),
+				esCandidato(OtroCandidato,Partido),
+				UnCandidato\=OtroCandidato),Anio>Anio2),
+		
+		forall((esCandidato(UnCandidato,Partido),
+				esCandidato(OtroCandidato,OtroPartido),
+				Partido\=OtroPartido,partidoDe(Pcia,Partido),
+				partidoDe(Pcia,OtroPartido),
+				intencionDeVotoEn(Pcia,Partido,Votos1),
+				intencionDeVotoEn(Pcia,OtroPartido,Votos2)),
+				Votos1>=Votos2).
 
 
 %%PUNTO 5
 
 ajusteConsultora(Pcia,Partido,IntencionVoto):-
-		intencionDeVotoEn(Pcia,Partido,IntencionVoto1),
+		forall((intencionDeVotoEn(Pcia,Partido,IntencionVoto1),
 		intencionDeVotoEn(Pcia,Partido2,IntencionVoto2),
-		Partido\=Partido2,
-		IntencionVoto<IntencionVoto2,
-		IntencionVoto is IntencionVoto1+(IntencionVoto1*0.05).
+		Partido\=Partido2),
+		(IntencionVoto1>IntencionVoto2 ->
+		Ajuste is -20 ; Ajuste is 5))),
+		IntencionVoto is IntencionVoto1+Ajuste.
 
 
 
@@ -304,7 +310,6 @@ promedioDeCrecimiento(Partido,PromedioFinal):-
 								PromedioConstruccionesComisarias+
 								PromedioConstruccionesEscuelas+
 								PromedioConstruccionJardines).
-
 
 
 
