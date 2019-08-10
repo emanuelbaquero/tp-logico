@@ -176,14 +176,10 @@ elGranCandidato(UnCandidato):-
 
 %%PUNTO 5
 
-ajusteConsultora(Pcia,Partido,IntencionVoto):-
-		forall((intencionDeVotoEn(Pcia,Partido,IntencionVoto1),
-		intencionDeVotoEn(Pcia,Partido2,IntencionVoto2),
-		Partido\=Partido2),
-		(IntencionVoto1>IntencionVoto2 ->
-		Ajuste is -20 ; Ajuste is 5))),
-		IntencionVoto is IntencionVoto1+Ajuste.
-
+ajusteConsultora(Pcia,Partido,VotosAjustados):-
+		intencionDeVotoEn(Pcia,Partido,IntencionVoto1),
+		(forall((intencionDeVotoEn(Pcia,OtroPartido,IntencionVoto2),Partido\=OtroPartido),(IntencionVoto1>IntencionVoto2)) ->
+		VotosAjustados is IntencionVoto1-20 ; VotosAjustados is IntencionVoto1+5).
 
 
 %%PUNTO 6
@@ -310,6 +306,9 @@ promedioDeCrecimiento(Partido,PromedioFinal):-
 								PromedioConstruccionesComisarias+
 								PromedioConstruccionesEscuelas+
 								PromedioConstruccionJardines).
+
+
+
 
 
 
