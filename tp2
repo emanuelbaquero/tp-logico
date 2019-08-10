@@ -202,7 +202,6 @@ promesa(amarillo,edilicio(hospital,100)).
 promesa(amarillo,edilicio(universidad,1)).
 promesa(amarillo,edilicio(comisarias,200)).
 
-promesa(rojo,edilicio(bar,20)).
 
 promesa(azul,nuevosPuestosDeTrabajo(0)).
 promesa(amarillo,nuevosPuestosDeTrabajo(10000)).
@@ -225,7 +224,7 @@ promete(Partido,Promesa):-
 influenciaDePromesas(Promesa,Partido,IntencionVotos) :-
 		Promesa = inflacion,
 		promesa(Partido,inflacion(CotaInf,CotaSup)),
-		IntencionVotos is ((CotaInf+CotaSup)/2).
+		IntencionVotos is -((CotaInf+CotaSup)/2).
 
 influenciaDePromesas(Promesa,Partido,IntencionVotos) :-
 		Promesa = nuevosPuestosDeTrabajo,
@@ -273,6 +272,16 @@ influenciaDePromesas(Promesa,Partido,IntencionVotos) :-
 			OtroEdificio\=universidad) ->
 		IntencionVotos is -NroOtroEdificio ; IntencionVotos is 0). 
 
+
+
+
+
+
+
+
+%%PUNTO 8
+
+
 %%CASO A
 promedioDeCrecimiento(Partido,PromedioFinal):-
 		promesa(Partido,inflacion(CotaInf,CotaSup)),
@@ -318,6 +327,9 @@ promedioDeCrecimiento(Partido,PromedioFinal):-
 								PromedioConstruccionesComisarias+
 								PromedioConstruccionesEscuelas+
 								PromedioConstruccionJardines).
+
+
+
 
 
 
